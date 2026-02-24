@@ -15,6 +15,10 @@ async function displayProducts(req, res) {
   try {
     const products = await orderService.displayProducts();
 
+    for (let i = 0; i < 10000; i++) {
+      console.log("Counter : ", i + 1);
+    }
+
     res.status(200).json(products);
   } catch (error) {
     console.log("Error while getting PRoducts ...?", error);
