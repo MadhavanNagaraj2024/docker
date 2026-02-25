@@ -1,9 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const redis = require("redis");
 const app = express();
 const routes = require("./routes/product.routes");
+require("./config/redis.config");
 
 app.use(express.json());
 
@@ -13,28 +13,13 @@ app.get("/test", (req, res) => {
   res.status(200).json({ message: "Router Working ...!" });
 });
 
-console.log(process.env.MONGO_DB);
-
-const client = redis.createClient();
-
-client.on("error", (err) => {
-  console.log("Error while connecting to redis...?", err);
-});
-
-client.on("connect", () => {
-  console.log("Connected to Redis...");
-});
-
-(async () => {
-  await client.connect();
-})();
-
 async function connectMongoDB() {
   try {
     await mongoose.connect(process.env.MONGO_DB);
+    console.log(process.env.MONGO_DB);
     console.log("Mongo DB Connected");
   } catch (error) {
-    console.log("Error while connecting mongo DB...?");
+    console.log("Error while connecting mongo DB...?", error);
     process.exit(1);
   }
 }
