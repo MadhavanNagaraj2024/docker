@@ -16,28 +16,24 @@ async function displayProducts(req, res) {
   try {
     const cacheKey = "products:all";
 
-    const catchedData = await redisClient.get(cacheKey);
+    const cachedData = await redisClient.get(cacheKey);
 
-    if (catchedData) {
-      console.log("✅ Data from cache...!");
-      return res.status(200).json(JSON.parse(catchedData));
+    if (cachedData) {
+      console.log("✅ Cache HIT");
+      return res.status(200).json(JSON.parse(cachedData));
     }
 
     console.log("❌ Cache MISS");
 
     const products = await orderService.displayProducts();
 
-    await redisClient.set(cacheKey, JSON.stringify(products), {
-      EX: 60,
-    });
+    await redisClient.set(cacheKey, JSON.stringify(products), { EX: 60 });
 
-    for (let i = 0; i < 10000; i++) {
-      process.stdout.write(`\rCounter : ${i + 1}`);
-    }
+    console.log("Saved to Redis");
 
     res.status(200).json(products);
   } catch (error) {
-    console.log("Error while getting PRoducts ...?", error);
+    console.log("Error:", error);
   }
 }
 
